@@ -28,6 +28,7 @@ def deleteMatches():
         print "Unable to clear matches database :\n %s" % (error)
         exit(1)
 
+
 def deletePlayers():
     """Remove all the player records from the database."""
 
@@ -44,6 +45,7 @@ def deletePlayers():
         print "Unable to clear players database :\n %s" % (error)
         exit(1)
 
+
 def countPlayers():
     """Returns the number of players currently registered."""
     try:
@@ -57,6 +59,7 @@ def countPlayers():
     except Exception as error:
         print "Unable to count players in database :\n %s" % (error)
         exit(1)
+
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -72,13 +75,14 @@ def registerPlayer(name):
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
         dbCursor.execute("""INSERT INTO "players" (name, wins, matches) VALUES (%s,%s,%s) """,
-         (name,0,0) )
+                         (name, 0, 0))
         dbConnection.commit()
         print "Successfully inserted %s into players database" % (name)
 
     except Exception as error:
         print "Unable to insert player into database :\n %s" % (error)
         exit(1)
+
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -98,7 +102,8 @@ def playerStandings():
         print "Calculating player standings"
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
-        dbCursor.execute(""" select id,name,wins,matches from players ORDER BY wins ASC """)
+        dbCursor.execute(
+            """ select id,name,wins,matches from players ORDER BY wins ASC """)
         output = dbCursor.fetchall()
         return output
 
@@ -120,10 +125,13 @@ def reportMatch(winner, loser):
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
         dbCursor.execute("""INSERT INTO "matches" (player_a_id, player_b_id, winner_id) VALUES (%s,%s,%s) """,
-         (winner,loser,winner) )
-        dbCursor.execute(""" UPDATE "players" SET matches = matches + 1 where id = '%s'  """,[winner])
-        dbCursor.execute(""" UPDATE "players" SET matches = matches + 1 where id = '%s'   """,[loser])
-        dbCursor.execute(""" UPDATE "players" SET wins = wins + 1 where id = '%s'  """,[winner])
+                         (winner, loser, winner))
+        dbCursor.execute(
+            """ UPDATE "players" SET matches = matches + 1 where id = '%s'  """, [winner])
+        dbCursor.execute(
+            """ UPDATE "players" SET matches = matches + 1 where id = '%s'   """, [loser])
+        dbCursor.execute(
+            """ UPDATE "players" SET wins = wins + 1 where id = '%s'  """, [winner])
         dbConnection.commit()
 
     except Exception as error:
@@ -151,21 +159,16 @@ def swissPairings():
     # For this project , we assume that the number of players is even
     if (len(list_of_players) % 2 != 0):
         print "Odd number of players ! Exiting !"
-        exit (1)
-    #Iterate through list of players
-    #Select pairs with equal or nearly-equal win record
+        exit(1)
+    # Iterate through list of players
+    # Select pairs with equal or nearly-equal win record
     pairing_list = []
     my_itr = iter(list_of_players)
-    for player in my_itr :
+    for player in my_itr:
         try:
-            next_player =  my_itr.next()
-            match = (player[0],player[1],next_player[0],next_player[1])
+            next_player = my_itr.next()
+            match = (player[0], player[1], next_player[0], next_player[1])
         except:
-            match = (player[0],player[1],'NA','NA')
+            match = (player[0], player[1], 'NA', 'NA')
         pairing_list.append(match)
     return pairing_list
-
-
-
-
-
