@@ -123,7 +123,7 @@ def reportMatch(winner, loser):
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
         dbCursor.execute("""INSERT INTO "matches" (winner_id,loser_id) VALUES (%s,%s) """,
-                         (winner,loser))
+                         (winner, loser))
         dbConnection.commit()
 
     except Exception as error:
