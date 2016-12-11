@@ -17,9 +17,7 @@ def deleteMatches():
         print "Clearing matches records from matches database"
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
-        dbCursor.execute(""" DELETE FROM "matches" """)
-        dbCursor.execute(""" UPDATE "players" SET matches = 0 """)
-        dbCursor.execute(""" UPDATE "players" SET wins = 0 """)
+        dbCursor.execute(""" TRUNCATE "matches" CASCADE """)
         dbConnection.commit()
         print "Successfully cleared matches database"
         return 0
@@ -36,7 +34,7 @@ def deletePlayers():
         print "Clearing player records from players database"
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
-        dbCursor.execute(""" DELETE FROM "players" """)
+        dbCursor.execute(""" TRUNCATE "players" CASCADE """)
         dbConnection.commit()
         print "Successfully cleared players database"
         return 0
@@ -74,8 +72,8 @@ def registerPlayer(name):
         print "Register Player"
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
-        dbCursor.execute("""INSERT INTO "players" (name, wins, matches) VALUES (%s,%s,%s) """,
-                         (name, 0, 0))
+        dbCursor.execute("""INSERT INTO "players" (name) VALUES (%s) """,
+                         (name,))
         dbConnection.commit()
         print "Successfully inserted %s into players database" % (name)
 
@@ -102,8 +100,8 @@ def playerStandings():
         print "Calculating player standings"
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
-        dbCursor.execute(
-            """ select id,name,wins,matches from players ORDER BY wins ASC """)
+        query = """select * from player_standings;"""
+        dbCursor.execute(query)
         output = dbCursor.fetchall()
         return output
 
@@ -124,14 +122,8 @@ def reportMatch(winner, loser):
         print "Report Match"
         dbConnection = connect()
         dbCursor = dbConnection.cursor()
-        dbCursor.execute("""INSERT INTO "matches" (player_a_id, player_b_id, winner_id) VALUES (%s,%s,%s) """,
-                         (winner, loser, winner))
-        dbCursor.execute(
-            """ UPDATE "players" SET matches = matches + 1 where id = '%s'  """, [winner])
-        dbCursor.execute(
-            """ UPDATE "players" SET matches = matches + 1 where id = '%s'   """, [loser])
-        dbCursor.execute(
-            """ UPDATE "players" SET wins = wins + 1 where id = '%s'  """, [winner])
+        dbCursor.execute("""INSERT INTO "matches" (winner_id,loser_id) VALUES (%s,%s) """,
+                         (winner,loser))
         dbConnection.commit()
 
     except Exception as error:
